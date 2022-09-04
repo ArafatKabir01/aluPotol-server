@@ -18,6 +18,7 @@ async function run(){
     await client.connect();
     const productCollection = client.db('alupotol').collection('AllProducts');
     const BlogCollection = client.db('alupotol').collection('Blog');
+    const PinedCollection = client.db('alupotol').collection('Pined_Product');
     app.get('/allProducts' , async(req , res)=>{
       const query ={};
       const cursor = productCollection.find(query);
@@ -79,14 +80,41 @@ async function run(){
 
 
     })
+    app.delete('/userProduct/:id', async(req , res)=>{
+      const id = req.params.id;
+      const query ={_id: ObjectId(id)}
+      const result = await PinedCollection.deleteOne(query)
+      res.send(result)
+
+
+    })
 
     app.post('/allProducts' , async(req , res)=> {
       const newProducts = req.body;
-      const result = await productCollection.insertOne(newProducts);
+      const result = await PinedCollection.insertOne(newProducts);
 
       console.log(newProducts)
       res.send(result);
-    })
+    });
+    //added product 
+    app.post('/userProducts' , async(req , res)=> {
+      const newProducts = req.body;
+      console.log(newProducts)
+      const query = { id : newProducts.id }
+      const exists = await PinedCollection.findOne(query);
+      if (exists) {
+        return res.send({ success: false, booking: exists })
+      }
+      const result = await PinedCollection.insertOne(newProducts);
+      console.log(newProducts)
+      res.send(result);
+    });
+    app.get('/myorders/:email', async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email }
+      const orders = await PinedCollection.find(query).toArray();
+      res.send(orders)
+  })
 
   }finally{
     //await client.close();
