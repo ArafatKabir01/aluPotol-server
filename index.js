@@ -97,6 +97,12 @@ async function run(){
       res.send(result);
     });
     //added product 
+    app.post('/addProduct' , async(req , res)=> {
+      const newProducts = req.body;
+      const result = await productCollection.insertOne(newProducts);
+      console.log(newProducts)
+      res.send(result);
+    });
     app.post('/userProducts' , async(req , res)=> {
       const newProducts = req.body;
       console.log(newProducts)
@@ -104,10 +110,12 @@ async function run(){
       const exists = await PinedCollection.findOne(query);
       if (exists) {
         return res.send({ success: false, booking: exists })
-      }
-      const result = await PinedCollection.insertOne(newProducts);
+      }else{
+        const result = await PinedCollection.insertOne(newProducts);
       console.log(newProducts)
       res.send(result);
+      }
+      
     });
     app.get('/myorders/:email', async (req, res) => {
       const email = req.query.email;
