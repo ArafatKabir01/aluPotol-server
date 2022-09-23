@@ -71,6 +71,27 @@ async function run(){
       res.send(result);
 
     })
+    app.put('/updateProduct/:id' , async(req , res)=>{
+      const id = req.params.id;
+      const newData = req.body;
+      console.log(newData.name)
+      const filter = {_id: ObjectId(id)}
+      const option ={upsert : true};
+      const updateQuantity = {
+        $set: {
+          name : newData.name,
+          img : newData.img,
+          price : newData.price,
+          quantity : newData.quantity,
+          supplyre : newData.supplyre,
+          date : newData.date
+        }
+      };
+      const result = productCollection.updateOne(filter , updateQuantity ,option)
+      res.send(result);
+
+    })
+
 
     app.delete('/product/:id', async(req , res)=>{
       const id = req.params.id;
